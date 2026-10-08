@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 type StoreItem = {
   id: number;
   name: string;
@@ -6,6 +8,7 @@ type StoreItem = {
   oldPrice: string | null;
   img: string;
   buyUrl: string;
+  sets?: { qty: number; price: number }[];
 };
 
 const FALLBACK_IMG = "https://cdn-icons-png.flaticon.com/512/679/679720.png";
@@ -20,6 +23,15 @@ const storeItems: StoreItem[] = [
     oldPrice: "1000៛",
     img: "https://i.ibb.co/zWxymcq8/photo-2026-09-09-15-08-06.jpg",
     buyUrl: CONTACT_URL,
+    sets: [
+      { qty: 1, price: 700 },
+      { qty: 2, price: 1400 },
+      { qty: 3, price: 2100 },
+      { qty: 4, price: 2800 },
+      { qty: 5, price: 3500 },
+      { qty: 6, price: 4200 },
+      { qty: 7, price: 4800 },
+    ],
   },
   {
     id: 2,
@@ -60,6 +72,25 @@ const storeItems: StoreItem[] = [
 ];
 
 function StoreCard({ item, delay }: { item: StoreItem; delay: number }) {
+  const [qty, setQty] = useState(1);
+  const picked = item.sets?.find((x) => x.qty === qty);
+
+  const priceText = picked ? `${picked.price}៛` : item.price;
+
+  let buyHref = item.buyUrl;
+  if (picked) {
+    const msg = [
+      "សួស្តី Admin! ខ្ញុំចង់ទិញ 🛍️",
+      "",
+      `📦 ទំនិញ: ${item.name}`,
+      `🔢 ចំនួន: ${picked.qty} set`,
+      `💰 តម្លៃសរុប: ${picked.price}៛`,
+      "",
+      `🖼️ ${item.img}`,
+    ].join("\n");
+    buyHref = `${item.buyUrl}?text=${encodeURIComponent(msg)}`;
+  }
+
   return (
     <div className="store-item" style={{ animationDelay: `${delay}s` }}>
       <div className="store-img-wrapper">
@@ -71,20 +102,37 @@ function StoreCard({ item, delay }: { item: StoreItem; delay: number }) {
             e.currentTarget.src = FALLBACK_IMG;
           }}
         />
-        {item.oldPrice && <span className="sale-badge">SALE</span>}
+        {item.oldPrice && !picked && <span className="sale-badge">SALE</span>}
       </div>
       <div className="store-info">
         <h3>{item.name}</h3>
         <p>{item.desc}</p>
+        {item.sets && (
+          <div className="set-picker">
+            <span className="set-label">ជ្រើស set:</span>
+            <div className="set-chips">
+              {item.sets.map((x) => (
+                <button
+                  key={x.qty}
+                  type="button"
+                  className={`set-chip${x.qty === qty ? " active" : ""}`}
+                  onClick={() => setQty(x.qty)}
+                >
+                  {x.qty}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         <div className="store-bottom">
           <div className="price-box">
             <span className="price-tag">
-              <span className="coin">🪙</span> {item.price}
+              <span className="coin">🪙</span> {priceText}
             </span>
-            {item.oldPrice && <span className="old-price">{item.oldPrice}</span>}
+            {item.oldPrice && !picked && <span className="old-price">{item.oldPrice}</span>}
           </div>
           <a
-            href={item.buyUrl}
+            href={buyHref}
             target="_blank"
             rel="noopener noreferrer"
             className="buy-btn"
