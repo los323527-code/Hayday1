@@ -60,15 +60,6 @@ const storeItems: StoreItem[] = [
     img: "https://i.ibb.co/YFdbPhfg/photo-2026-09-14-05-54-37.jpg",
     buyUrl: CONTACT_URL,
   },
-  {
-    id: 5,
-    name: "Account Hayday",
-    desc: "Level 36, Barn 1050, Silo 525",
-    price: "6000៛",
-    oldPrice: null,
-    img: "https://i.ibb.co/N2NFh3y1/photo-2026-09-17-16-44-54.jpg",
-    buyUrl: CONTACT_URL,
-  },
 ];
 
 function StoreCard({ item, delay }: { item: StoreItem; delay: number }) {
