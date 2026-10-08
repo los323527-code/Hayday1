@@ -2,11 +2,13 @@
 
 *{-webkit-tap-highlight-color:transparent;box-sizing:border-box;margin:0;padding:0}
 #root,body,html{min-height:100%;width:100%}
-body{background:linear-gradient(180deg,#a8e6ff,#c9f0ff 40%,#d9f5c8 70%,#a8d878);background-attachment:fixed;font-family:Fredoka,Kantumruy Pro,sans-serif;overflow-x:hidden}
+html{background:#5ec3ff}
+body{background:transparent;font-family:Fredoka,Kantumruy Pro,sans-serif;overflow-x:hidden}
+body::before{background:url("./assets/bg.jpg") center/cover no-repeat;content:"";inset:0;position:fixed;z-index:-1}
 
 .app{align-items:flex-start;display:flex;justify-content:center;min-height:100vh;min-height:100dvh;overflow:hidden;padding:24px 16px 90px;position:relative}
 
-.sky{inset:0;pointer-events:none;position:fixed;z-index:0}
+.sky{display:none;inset:0;pointer-events:none;position:fixed;z-index:0}
 .sun{animation:spin 25s linear infinite;font-size:60px;position:absolute;right:40px;top:30px}
 @keyframes spin{to{transform:rotate(1turn)}}
 
