@@ -15,7 +15,7 @@ const storeItems: StoreItem[] = [
   {
     id: 1,
     name: "Bem, Lem, Sem",
-    desc: "1set = 700៛, 7set = 4800៛, 30set = 20000៛ (Cream ឬ Butter ចំនួន 100 🧀🍨)",
+    desc: "1set = 700៛, 7set = 4800៛, 30set = 20000៛",
     price: "700៛",
     oldPrice: "1000៛",
     img: "https://i.ibb.co/zWxymcq8/photo-2026-09-09-15-08-06.jpg",
