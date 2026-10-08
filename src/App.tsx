@@ -98,8 +98,6 @@ function StoreCard({ item, delay }: { item: StoreItem; delay: number }) {
 }
 
 export default function App() {
-  const grass = ["🌾", "🌻", "🐄", "🌾", "🐔", "🌻", "🐑", "🌾"];
-
   return (
     <div className="app">
       <div className="sky">
@@ -123,11 +121,6 @@ export default function App() {
         <p className="footer-text">🌾 Create by Theanlay 2026 🌾</p>
       </div>
 
-      <div className="grass">
-        {grass.map((g, i) => (
-          <span key={i}>{g}</span>
-        ))}
-      </div>
     </div>
   );
 }
