@@ -12,7 +12,7 @@ type StoreItem = {
 };
 
 const FALLBACK_IMG = "https://cdn-icons-png.flaticon.com/512/679/679720.png";
-const CONTACT_URL = "https://t.me/theanlay";
+const CONTACT_URL = "https://t.me/Tradev14";
 
 const storeItems: StoreItem[] = [
   {
