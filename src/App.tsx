@@ -118,7 +118,6 @@ export default function App() {
           </div>
         </div>
 
-        <p className="footer-text">🌾 Create by Theanlay 2026 🌾</p>
       </div>
 
     </div>
