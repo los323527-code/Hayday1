@@ -146,3 +146,25 @@ body::before{background:url("./assets/bg.jpg") center/cover no-repeat;content:""
 .set-chips{display:flex;flex-wrap:wrap;gap:5px}
 .set-chip{background:#fff4e0;border:2px solid #8b5a2b;border-radius:9px;color:#7a4a10;cursor:pointer;font-family:Fredoka,Kantumruy Pro,sans-serif;font-size:13px;font-weight:700;height:28px;min-width:28px;padding:0 6px;transition:all .12s}
 .set-chip.active{background:linear-gradient(180deg,#66bb6a,#4caf50);border-color:#2e7d32;box-shadow:0 2px 0 #2e7d32;color:#fff;transform:translateY(-1px)}
+
+.adm-wrap{display:flex;justify-content:center;min-height:100vh;padding:18px 12px 40px}
+.adm-card{background:#fffaf0;border:4px solid #8b5a2b;border-radius:22px;box-shadow:0 6px 0 #6b4220;display:flex;flex-direction:column;gap:10px;height:max-content;max-width:460px;padding:18px;width:100%}
+.adm-title{color:#5a3a1a;font-size:22px;text-align:center}
+.adm-sub{border-top:2px dashed #d4b896;color:#5a3a1a;font-size:16px;margin-top:8px;padding-top:12px}
+.adm-label{color:#7a4a10;display:flex;flex-direction:column;font-family:Kantumruy Pro,sans-serif;font-size:13px;font-weight:700;gap:4px}
+.adm-input{background:#fff;border:2px solid #8b5a2b;border-radius:10px;color:#3a2410;font-family:Kantumruy Pro,sans-serif;font-size:15px;padding:9px 10px;width:100%}
+.adm-json{font-family:monospace;font-size:11px;height:150px}
+.adm-row{display:flex;flex-wrap:wrap;gap:8px}
+.adm-btn{border:0;border-radius:12px;color:#fff;cursor:pointer;font-family:Kantumruy Pro,sans-serif;font-size:15px;font-weight:700;padding:11px 16px}
+.adm-green{background:#4caf50;box-shadow:0 3px 0 #2e7d32}
+.adm-blue{background:#1e88e5;box-shadow:0 3px 0 #1565c0}
+.adm-gray{background:#8d8d8d;box-shadow:0 3px 0 #666}
+.adm-red{background:#e53935!important;color:#fff!important}
+.adm-mini{background:#fff4e0;border:2px solid #8b5a2b;border-radius:8px;color:#5a3a1a;cursor:pointer;font-family:Kantumruy Pro,sans-serif;font-size:13px;font-weight:700;padding:4px 10px}
+.adm-msg{color:#c62828;font-family:Kantumruy Pro,sans-serif;font-size:13px;font-weight:700}
+.adm-note{color:#7a4a10;font-family:Kantumruy Pro,sans-serif;font-size:12.5px;line-height:1.5}
+.adm-link{color:#1e88e5;font-family:Kantumruy Pro,sans-serif;font-size:13px;text-align:center}
+.adm-item{align-items:center;background:#fff;border:2px solid #e0c9a6;border-radius:14px;display:flex;gap:10px;padding:8px}
+.adm-item img{border-radius:10px;height:62px;object-fit:cover;width:62px}
+.adm-item-info{display:flex;flex-direction:column;font-family:Kantumruy Pro,sans-serif;font-size:13px;gap:4px;min-width:0}
+.adm-item-info b{color:#5a3a1a;overflow-wrap:anywhere}
