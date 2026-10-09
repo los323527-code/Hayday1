@@ -23,7 +23,7 @@ function StoreCard({ item, delay }: { item: StoreItem; delay: number }) {
       `🔢 ចំនួន: ${picked.qty} set`,
       `💰 តម្លៃសរុប: ${fmt(picked)}`,
       "",
-      `🖼️ ${item.img}`,
+      `🖼️ ${item.img.startsWith("/") ? window.location.origin + item.img : item.img}`,
     ].join("\n");
     buyHref = `${CONTACT_URL}?text=${encodeURIComponent(msg)}`;
   }

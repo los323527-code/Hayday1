@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { fetchProducts, postAdmin } from "./api";
+import type { ChangeEvent } from "react";
+import { fetchProducts, postAdmin, uploadImage } from "./api";
 import productsData from "./products.json";
 import { FALLBACK_IMG, fmtPrice, makeSets } from "./types";
 import type { StoreItem } from "./types";
@@ -7,6 +8,36 @@ import type { StoreItem } from "./types";
 const KEY_STORE = "hd_admin_key";
 
 const deployed = productsData as unknown as StoreItem[];
+
+// Shrink a photo in the browser (max 900px JPEG) before uploading
+function compressImage(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const max = 900;
+      const scale = Math.min(1, max / Math.max(img.width, img.height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(img.width * scale));
+      canvas.height = Math.max(1, Math.round(img.height * scale));
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        URL.revokeObjectURL(url);
+        return reject(new Error("canvas"));
+      }
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL("image/jpeg", 0.8));
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("load"));
+    };
+    img.src = url;
+  });
+}
 
 type Form = {
   name: string;
@@ -75,6 +106,27 @@ export default function Admin() {
       setItems(prev);
       setMsg("❌ " + (r.error || "រក្សាទុកមិនបាន"));
     }
+  };
+
+  const onPickImage = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setBusy(true);
+    setMsg("⏳ កំពុង upload រូប...");
+    try {
+      const dataUrl = await compressImage(file);
+      const r = await uploadImage(adminKey, dataUrl);
+      if (r.ok && r.url) {
+        setForm((f) => ({ ...f, img: r.url as string }));
+        setMsg("✅ បាន upload រូបរួច សូមចុច «បន្ថែម/រក្សាទុក»");
+      } else {
+        setMsg("❌ " + (r.error || "upload រូបមិនបាន"));
+      }
+    } catch {
+      setMsg("❌ មិនអាចអានរូបនេះបានទេ");
+    }
+    setBusy(false);
   };
 
   const login = async () => {
@@ -206,7 +258,15 @@ export default function Admin() {
             onChange={(e) => setForm({ ...form, desc: e.target.value })}
           />
         </label>
-        {field("តំណរូបភាព (URL)", "img", { placeholder: "https://i.ibb.co/..." })}
+        <div className="adm-label">
+          រូបភាព
+          {form.img && <img className="adm-preview" src={form.img} alt="" />}
+          <label className="adm-btn adm-blue adm-upload">
+            📷 ជ្រើសរូបពីទូរស័ព្ទ
+            <input type="file" accept="image/*" onChange={onPickImage} disabled={busy} hidden />
+          </label>
+        </div>
+        {field("ឬដាក់តំណរូបភាព (URL)", "img", { placeholder: "https://..." })}
         {field("តម្លៃ 1 set (៛)", "unit", { inputMode: "numeric", placeholder: "700" })}
         {field("តម្លៃខ្ពស់បំផុត 1 set (ទុកទទេ បើតម្លៃតែមួយ)", "unitMax", { inputMode: "numeric" })}
         {field("តម្លៃ 7 set ពិសេស (ទុកទទេ បើគុណធម្មតា)", "seven", { inputMode: "numeric", placeholder: "4800" })}

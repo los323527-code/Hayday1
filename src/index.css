@@ -171,3 +171,5 @@ body::before{background:url("./assets/bg.jpg") center/cover no-repeat;content:""
 
 .secret-spot{-webkit-tap-highlight-color:transparent;bottom:0;height:13vh;left:6%;position:fixed;user-select:none;width:30%;z-index:1}
 .adm-btn:disabled{opacity:.55}
+.adm-upload{display:block;text-align:center}
+.adm-preview{border:2px solid #8b5a2b;border-radius:12px;max-height:160px;object-fit:cover;width:100%}

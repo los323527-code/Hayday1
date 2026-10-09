@@ -28,3 +28,21 @@ export async function postAdmin(
     return { ok: false, error: "មិនអាចតភ្ជាប់ server បានទេ" };
   }
 }
+
+export async function uploadImage(
+  key: string,
+  image: string
+): Promise<{ ok: boolean; url?: string; error?: string }> {
+  try {
+    const r = await fetch("/api/products", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ key, image }),
+    });
+    const j = await r.json().catch(() => ({}));
+    if (r.ok && j.url) return { ok: true, url: j.url as string };
+    return { ok: false, error: j.error || "upload រូបមិនបាន" };
+  } catch {
+    return { ok: false, error: "មិនអាចតភ្ជាប់ server បានទេ" };
+  }
+}
