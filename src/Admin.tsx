@@ -81,7 +81,7 @@ export default function Admin() {
       }
       setAuthed(true);
     } else {
-      setMsg("ពាក្យសម្ងាត់មិនត្រឹមត្រូវ");
+      setMsg("Key មិនត្រឹមត្រូវ");
     }
   };
 
@@ -156,7 +156,7 @@ export default function Admin() {
           <input
             className="adm-input"
             type="password"
-            placeholder="ពាក្យសម្ងាត់"
+            placeholder="Key"
             value={pw}
             onChange={(e) => setPw(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && login()}

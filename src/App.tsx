@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Admin from "./Admin";
 import productsData from "./products.json";
 import { CONTACT_URL, FALLBACK_IMG, fmtPrice } from "./types";
@@ -89,10 +89,24 @@ export default function App() {
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
 
+  // Secret entry: tap the cat's tongue 7 times quickly to open Admin
+  const taps = useRef({ count: 0, last: 0 });
+  const onSecretTap = () => {
+    const now = Date.now();
+    const t = taps.current;
+    t.count = now - t.last > 1500 ? 1 : t.count + 1;
+    t.last = now;
+    if (t.count >= 7) {
+      t.count = 0;
+      window.location.hash = "#admin";
+    }
+  };
+
   if (route === "#admin") return <Admin />;
 
   return (
     <div className="app">
+      <div className="secret-spot" onClick={onSecretTap} />
       <div className="sky">
         <div className="sun">🌞</div>
         <div className="cloud cloud-1">☁️</div>
