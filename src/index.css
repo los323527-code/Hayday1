@@ -170,3 +170,4 @@ body::before{background:url("./assets/bg.jpg") center/cover no-repeat;content:""
 .adm-item-info b{color:#5a3a1a;overflow-wrap:anywhere}
 
 .secret-spot{-webkit-tap-highlight-color:transparent;bottom:0;height:13vh;left:6%;position:fixed;user-select:none;width:30%;z-index:1}
+.adm-btn:disabled{opacity:.55}

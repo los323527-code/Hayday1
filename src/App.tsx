@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import Admin from "./Admin";
 import productsData from "./products.json";
+import { fetchProducts } from "./api";
 import { CONTACT_URL, FALLBACK_IMG, fmtPrice } from "./types";
 import type { StoreItem } from "./types";
 
-const storeItems = productsData as unknown as StoreItem[];
+const defaultItems = productsData as unknown as StoreItem[];
 
 function StoreCard({ item, delay }: { item: StoreItem; delay: number }) {
   const [qty, setQty] = useState(1);
@@ -83,6 +84,16 @@ function StoreCard({ item, delay }: { item: StoreItem; delay: number }) {
 
 export default function App() {
   const [route, setRoute] = useState(window.location.hash);
+  const [storeItems, setStoreItems] = useState<StoreItem[]>(defaultItems);
+  useEffect(() => {
+    let alive = true;
+    fetchProducts().then((live) => {
+      if (alive && live) setStoreItems(live);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
   useEffect(() => {
     const onHash = () => setRoute(window.location.hash);
     window.addEventListener("hashchange", onHash);

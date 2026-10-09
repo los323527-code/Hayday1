@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
+import { fetchProducts, postAdmin } from "./api";
 import productsData from "./products.json";
 import { FALLBACK_IMG, fmtPrice, makeSets } from "./types";
 import type { StoreItem } from "./types";
 
-// Change this password before publishing!
-const ADMIN_PASSWORD = "hayday2026";
-const DRAFT_KEY = "hd_admin_draft";
-const AUTH_KEY = "hd_admin_ok";
+const KEY_STORE = "hd_admin_key";
 
 const deployed = productsData as unknown as StoreItem[];
 
@@ -21,16 +19,6 @@ type Form = {
 };
 
 const emptyForm: Form = { name: "", desc: "", img: "", unit: "", unitMax: "", seven: "", oldPrice: "" };
-
-function loadDraft(): StoreItem[] {
-  try {
-    const raw = localStorage.getItem(DRAFT_KEY);
-    if (raw) return JSON.parse(raw) as StoreItem[];
-  } catch {
-    /* ignore */
-  }
-  return deployed;
-}
 
 function toForm(it: StoreItem): Form {
   const first = it.sets[0];
@@ -49,39 +37,60 @@ function toForm(it: StoreItem): Form {
 }
 
 export default function Admin() {
-  const [authed, setAuthed] = useState(() => {
+  const [adminKey, setAdminKey] = useState(() => {
     try {
-      return sessionStorage.getItem(AUTH_KEY) === "1";
+      return sessionStorage.getItem(KEY_STORE) || "";
     } catch {
-      return false;
+      return "";
     }
   });
+  const authed = adminKey !== "";
   const [pw, setPw] = useState("");
-  const [items, setItems] = useState<StoreItem[]>(loadDraft);
+  const [items, setItems] = useState<StoreItem[]>(deployed);
   const [form, setForm] = useState<Form>(emptyForm);
   const [editId, setEditId] = useState<number | null>(null);
   const [msg, setMsg] = useState("");
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    try {
-      localStorage.setItem(DRAFT_KEY, JSON.stringify(items));
-    } catch {
-      /* ignore */
+    let alive = true;
+    fetchProducts().then((live) => {
+      if (alive && live) setItems(live);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  // Save to server: live on the website immediately
+  const persist = async (next: StoreItem[], okMsg: string) => {
+    const prev = items;
+    setItems(next);
+    setBusy(true);
+    const r = await postAdmin(adminKey, next);
+    setBusy(false);
+    if (r.ok) {
+      setMsg(okMsg);
+    } else {
+      setItems(prev);
+      setMsg("❌ " + (r.error || "រក្សាទុកមិនបាន"));
     }
-  }, [items]);
+  };
 
-  const json = JSON.stringify(items, null, 2);
-
-  const login = () => {
-    if (pw === ADMIN_PASSWORD) {
+  const login = async () => {
+    setBusy(true);
+    const r = await postAdmin(pw);
+    setBusy(false);
+    if (r.ok) {
       try {
-        sessionStorage.setItem(AUTH_KEY, "1");
+        sessionStorage.setItem(KEY_STORE, pw);
       } catch {
         /* ignore */
       }
-      setAuthed(true);
+      setAdminKey(pw);
+      setMsg("");
     } else {
-      setMsg("Key មិនត្រឹមត្រូវ");
+      setMsg("❌ " + (r.error || "Key មិនត្រឹមត្រូវ"));
     }
   };
 
@@ -100,11 +109,12 @@ export default function Admin() {
     };
     if (editId === null) {
       const id = items.reduce((m, x) => Math.max(m, x.id), 0) + 1;
-      setItems([...items, { id, ...base }]);
-      setMsg("✅ បានបន្ថែមទំនិញថ្មី");
+      persist([...items, { id, ...base }], "✅ បានបន្ថែម ហើយបង្ហាញលើគេហទំព័ររួច");
     } else {
-      setItems(items.map((x) => (x.id === editId ? { id: x.id, ...base } : x)));
-      setMsg("✅ បានកែប្រែទំនិញ");
+      persist(
+        items.map((x) => (x.id === editId ? { id: x.id, ...base } : x)),
+        "✅ បានកែប្រែ ហើយបង្ហាញលើគេហទំព័ររួច"
+      );
     }
     setForm(emptyForm);
     setEditId(null);
@@ -119,7 +129,7 @@ export default function Admin() {
 
   const remove = (it: StoreItem) => {
     if (window.confirm(`លុប "${it.name}" ?`)) {
-      setItems(items.filter((x) => x.id !== it.id));
+      persist(items.filter((x) => x.id !== it.id), "✅ បានលុបរួច");
     }
   };
 
@@ -128,21 +138,12 @@ export default function Admin() {
     if (j < 0 || j >= items.length) return;
     const next = [...items];
     [next[idx], next[j]] = [next[j], next[idx]];
-    setItems(next);
-  };
-
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(json);
-      setMsg("📋 បានចម្លង products.json ហើយ");
-    } catch {
-      setMsg("ចម្លងមិនបាន សូមចុចលើប្រអប់ខាងក្រោម ហើយ Select all → Copy");
-    }
+    persist(next, "✅ បានប្តូរលំដាប់រួច");
   };
 
   const reset = () => {
-    if (window.confirm("ត្រឡប់ទៅទំនិញដែលកំពុងដាក់លើគេហទំព័រ?")) {
-      setItems(deployed);
+    if (window.confirm("ត្រឡប់ទៅទំនិញដើម (ពេលដំឡើងដំបូង)?")) {
+      persist(deployed, "✅ បានត្រឡប់ទៅទំនិញដើមរួច");
       setForm(emptyForm);
       setEditId(null);
     }
@@ -161,7 +162,7 @@ export default function Admin() {
             onChange={(e) => setPw(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && login()}
           />
-          <button className="adm-btn adm-green" onClick={login}>
+          <button className="adm-btn adm-green" onClick={login} disabled={busy}>
             ចូល
           </button>
           {msg && <p className="adm-msg">{msg}</p>}
@@ -212,7 +213,7 @@ export default function Admin() {
         {field("តម្លៃចាស់ (ឧ. 1000៛ ទុកទទេ បើគ្មាន)", "oldPrice")}
 
         <div className="adm-row">
-          <button className="adm-btn adm-green" onClick={save}>
+          <button className="adm-btn adm-green" onClick={save} disabled={busy}>
             {editId === null ? "បន្ថែម" : "រក្សាទុក"}
           </button>
           {editId !== null && (
@@ -252,18 +253,8 @@ export default function Admin() {
           </div>
         ))}
 
-        <h3 className="adm-sub">🚀 ដាក់ឡើងគេហទំព័រ</h3>
-        <p className="adm-note">
-          ការកែនៅទីនេះរក្សាទុកក្នុងទូរស័ព្ទអ្នកប៉ុណ្ណោះ។ ដើម្បីឱ្យអតិថិជនឃើញ ចុច «ចម្លង» រួចយកទៅជំនួសក្នុងឯកសារ
-          <b> src/products.json </b>
-          លើ GitHub (Edit → Paste → Commit)។
-        </p>
-        <button className="adm-btn adm-blue" onClick={copy}>
-          📋 ចម្លង products.json
-        </button>
-        <textarea className="adm-input adm-json" readOnly value={json} onFocus={(e) => e.currentTarget.select()} />
         <button className="adm-btn adm-gray" onClick={reset}>
-          ↩︎ ត្រឡប់ទៅកំណែលើគេហទំព័រ
+          ↩︎ ត្រឡប់ទៅទំនិញដើម
         </button>
       </div>
     </div>
